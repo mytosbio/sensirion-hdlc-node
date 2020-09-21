@@ -8,7 +8,7 @@ MILLISECONDS_PER_MINUTE = 1000 * 60
 SCALE_FACTOR = 500
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 
 
 def create_serial_port(path: str) -> ShdlcSerialPort:
