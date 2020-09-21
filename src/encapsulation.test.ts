@@ -1,4 +1,9 @@
-import { __flipBit, encode, decode } from "./encapsulation";
+import {
+    __flipBit,
+    __calculateChecksum,
+    encodeFrame,
+    decodeFrame,
+} from "./encapsulation";
 
 describe("Encapsulation", () => {
     describe("flipBit()", () => {
@@ -16,15 +21,49 @@ describe("Encapsulation", () => {
             },
         );
     });
-    describe("encode()", () => {
-        test("should add start and end bytes", () => {
-            const data = [0x00, 0x24, 0x01, 0x03, 0xd7];
-            const expected = [0x7e, 0x00, 0x24, 0x01, 0x03, 0xd7, 0x7e];
-            expect(encode(data)).toEqual(expected);
+    describe("calculateChecksum()", () => {
+        test("should calculate checksum from zero length data", () => {
+            const checksum = __calculateChecksum([0x00, 0xd3, 0x00, 0x00]);
+            expect(checksum).toEqual(0x2c);
         });
-        test("should add start and end bytes complex", () => {
-            const data = [0x00, 0x33, 0x04, 0x00, 0xfa, 0x36, 0x08, 0x90];
-            expect(encode(data)).toEqual([
+        test("should calculate checksum from extensive data", () => {
+            const checksum = __calculateChecksum([
+                0x00,
+                0xd0,
+                0x00,
+                0x13,
+                0x52,
+                0x53,
+                0x34,
+                0x38,
+                0x35,
+                0x20,
+                0x53,
+                0x65,
+                0x6e,
+                0x73,
+                0x6f,
+                0x72,
+                0x20,
+                0x43,
+                0x61,
+                0x62,
+                0x6c,
+                0x65,
+                0x00,
+            ]);
+            expect(checksum).toEqual(0x45);
+        });
+    });
+    describe("encodeFrame()", () => {
+        test("should add start, checksum and end", () => {
+            const data = [0x00, 0x24, 0x01, 0x03];
+            const expected = [0x7e, 0x00, 0x24, 0x01, 0x03, 0xd7, 0x7e];
+            expect(encodeFrame(data)).toEqual(expected);
+        });
+        test("should add start, checksum and end complex", () => {
+            const data = [0x00, 0x33, 0x04, 0x00, 0xfa, 0x36, 0x08];
+            expect(encodeFrame(data)).toEqual([
                 0x7e,
                 0x00,
                 0x33,
@@ -38,8 +77,8 @@ describe("Encapsulation", () => {
             ]);
         });
         test("should escape special characters", () => {
-            const data = [0x11, 0x33, 0x04, 0x00, 0xfa, 0x36, 0x08, 0x7f];
-            expect(encode(data)).toEqual([
+            const data = [0x11, 0x33, 0x04, 0x00, 0xfa, 0x36, 0x08];
+            expect(encodeFrame(data)).toEqual([
                 0x7e,
                 0x7d,
                 0x31,
@@ -54,8 +93,8 @@ describe("Encapsulation", () => {
             ]);
         });
         test("should escape special characters", () => {
-            const data = [0x00, 0x33, 0x04, 0x00, 0x13, 0x36, 0x08, 0x77];
-            expect(encode(data)).toEqual([
+            const data = [0x00, 0x33, 0x04, 0x00, 0x13, 0x36, 0x08];
+            expect(encodeFrame(data)).toEqual([
                 0x7e,
                 0x00,
                 0x33,
@@ -70,8 +109,8 @@ describe("Encapsulation", () => {
             ]);
         });
     });
-    describe("decode()", () => {
-        test("should decode real world example get device info", () => {
+    describe("decodeFrame()", () => {
+        test("should decodeFrame real world example get device info", () => {
             const received = [
                 0x7e,
                 0x00,
@@ -101,7 +140,7 @@ describe("Encapsulation", () => {
                 0x45,
                 0x7e,
             ];
-            expect(decode(received)).toEqual([
+            expect(decodeFrame(received)).toEqual([
                 0x00,
                 0xd0,
                 0x00,
@@ -128,7 +167,7 @@ describe("Encapsulation", () => {
                 0x45,
             ]);
         });
-        test("should decode real world example get last measurement", () => {
+        test("should decodeFrame real world example get last measurement", () => {
             const received = [
                 0x7e,
                 0x00,
@@ -140,7 +179,7 @@ describe("Encapsulation", () => {
                 0x03,
                 0x7e,
             ];
-            expect(decode(received)).toEqual([
+            expect(decodeFrame(received)).toEqual([
                 0x00,
                 0x35,
                 0x00,

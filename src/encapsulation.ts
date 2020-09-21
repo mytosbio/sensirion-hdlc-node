@@ -1,3 +1,5 @@
+import { ChecksumInvalid } from "./errors";
+
 const START_BYTE = 0x7e;
 const STOP_BYTE = 0x7e;
 const ESCAPE_BYTE = 0x7d;
@@ -13,13 +15,26 @@ const SPECIAL_BYTES = [0x7e, 0x7d, 0x11, 0x13];
 export const __flipBit = (byte: number, bit = 5): number => (1 << bit) ^ byte;
 
 /**
+ * Calculate the checksum for an encoded frame
+ * @param encoded - Encoded frame to calculate checksum for
+ * @returns Calculated checksum
+ */
+export const __calculateChecksum = (encoded: number[]): number => {
+    const sum = encoded.reduce((sum: number, byte: number) => sum + byte, 0);
+    const leastSignificantByte = sum & 0xff;
+    return leastSignificantByte ^ 0xff;
+};
+
+/**
  * Encode a frame with escape characters
  * @param frame - Unencoded frame of bytes
  * @returns Encoded bytes
  */
-export const encode = (frame: number[]): number[] => {
+export const encodeFrame = (frame: number[]): number[] => {
+    const checksum = __calculateChecksum(frame);
+    const data = [...frame, checksum];
     const escapedBytes = Array<number>().concat(
-        ...frame.map(byte =>
+        ...data.map(byte =>
             SPECIAL_BYTES.includes(byte)
                 ? [ESCAPE_BYTE, __flipBit(byte)]
                 : [byte],
@@ -33,7 +48,7 @@ export const encode = (frame: number[]): number[] => {
  * @param received - Raw received bytes to decode
  * @returns Decoded bytes
  */
-export const decode = (received: number[]): number[] => {
+export const decodeFrame = (received: number[]): number[] => {
     const decoded = [];
     let wasEscaped = false;
     const lastIndex = received.length - 1;
@@ -51,14 +66,10 @@ export const decode = (received: number[]): number[] => {
             decoded.push(received[i]);
         }
     }
+    const data = decoded.slice(0, -1);
+    const checksum = decoded[data.length];
+    if (checksum !== __calculateChecksum(data)) {
+        throw new ChecksumInvalid("Checksum invalid when decoding message");
+    }
     return decoded;
-};
-
-/**
- * Calculate the checksum for an encoded frame
- * @param encoded - Encoded frame to calculate checksum for
- * @returns Calculated checksum
- */
-export const calculateChecksum = (encoded: number[]): number[] => {
-    return [];
 };
