@@ -1,0 +1,10 @@
+{
+  "name": "sensirion-flow-meter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "serialport": "^9.0.1"
+  }
+}
