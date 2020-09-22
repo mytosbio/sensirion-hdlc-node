@@ -24,6 +24,36 @@ describe("PortUtilities", () => {
             expect(subscriber).nthCalledWith(4, 0x4);
         });
     });
+    describe("storeBytes()", () => {
+        const mockObserver = jest.fn();
+        let subject: Subject<number>;
+        beforeEach(() => {
+            subject = new Subject<number>();
+            mockObserver.mockReset();
+        });
+        test("should not replay bytes sent before", async () => {
+            subject.next(0xaa);
+            const replaySubject = storeBytes(subject);
+            replaySubject.subscribe(mockObserver);
+            expect(mockObserver).toBeCalledTimes(0);
+        });
+        test("should replay bytes sent after store", async () => {
+            const replaySubject = storeBytes(subject);
+            subject.next(0xab);
+            replaySubject.subscribe(mockObserver);
+            expect(mockObserver).toBeCalledTimes(1);
+            expect(mockObserver).toBeCalledWith(0xab);
+        });
+        test("should replay bytes sent after store and after subscribe", async () => {
+            const replaySubject = storeBytes(subject);
+            subject.next(0xab);
+            replaySubject.subscribe(mockObserver);
+            subject.next(0xac);
+            expect(mockObserver).toBeCalledTimes(2);
+            expect(mockObserver).toHaveBeenNthCalledWith(1, 0xab);
+            expect(mockObserver).toHaveBeenNthCalledWith(2, 0xac);
+        });
+    });
     describe("collectResponses()", () => {
         const terminal = 0xaa;
         let replaySubject: ReplaySubject<number>;
