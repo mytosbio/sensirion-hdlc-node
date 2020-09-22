@@ -44,7 +44,9 @@
     "prettier": "@hackscience/prettier-config",
     "dependencies": {
         "@types/pino": "^6.0.1",
+        "@types/serialport": "^8.0.1",
         "pino": "^6.2.1",
+        "rxjs": "^6.6.3",
         "serialport": "^9.0.1"
     },
     "devDependencies": {

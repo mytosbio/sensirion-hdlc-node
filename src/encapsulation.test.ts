@@ -110,7 +110,7 @@ describe("Encapsulation", () => {
         });
     });
     describe("decodeFrame()", () => {
-        test("should decodeFrame real world example get device info", () => {
+        test("should decode frame for get device info and verify checksum", () => {
             const received = [
                 0x7e,
                 0x00,
@@ -164,10 +164,9 @@ describe("Encapsulation", () => {
                 0x6c,
                 0x65,
                 0x00,
-                0x45,
             ]);
         });
-        test("should decodeFrame real world example get last measurement", () => {
+        test("should decode frame for get last measurement and verify checksum", () => {
             const received = [
                 0x7e,
                 0x00,
@@ -186,8 +185,19 @@ describe("Encapsulation", () => {
                 0x02,
                 0xff,
                 0xc6,
-                0x03,
             ]);
+        });
+        test("should decode frame with start and stop characters", () => {
+            const received = [0x7e, 0x00, 0xd0, 0x00, 0x7d, 0x33, 0x1c, 0x7e];
+            expect(decodeFrame(received)).toEqual([0x00, 0xd0, 0x00, 0x13]);
+        });
+        test("should decode frame with a start but no stop character", () => {
+            const received = [0x7e, 0x00, 0xd0, 0x00, 0x7d, 0x33, 0x1c];
+            expect(decodeFrame(received)).toEqual([0x00, 0xd0, 0x00, 0x13]);
+        });
+        test("should decode frame with no start or stop characters", () => {
+            const received = [0x00, 0xd0, 0x00, 0x7d, 0x33, 0x1c];
+            expect(decodeFrame(received)).toEqual([0x00, 0xd0, 0x00, 0x13]);
         });
     });
 });

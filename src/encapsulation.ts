@@ -68,8 +68,11 @@ export const decodeFrame = (received: number[]): number[] => {
     }
     const data = decoded.slice(0, -1);
     const checksum = decoded[data.length];
-    if (checksum !== __calculateChecksum(data)) {
-        throw new ChecksumInvalid("Checksum invalid when decoding message");
+    const expectedChecksum = __calculateChecksum(data);
+    if (checksum !== expectedChecksum) {
+        throw new ChecksumInvalid(
+            `Checksum invalid expected ${expectedChecksum} but received ${checksum}`,
+        );
     }
-    return decoded;
+    return data;
 };
