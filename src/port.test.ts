@@ -34,19 +34,15 @@ describe("SerialPort", () => {
         let mockBinding: MockBinding;
         const sendData = [0x01, 0x02];
         const emitData = [TERMINAL_BYTE, TERMINAL_BYTE];
-        beforeEach(async () => {
+        beforeEach(() => {
             MockBinding.createPort(PORT_PATH, { record: true });
             mockBinding = port.port.binding as any;
             mockEncodeFrame.mockReturnValue(sendData);
             mockDecodeFrame.mockReturnValue([]);
-            await port.open();
+            return port.open();
         });
-        afterEach(async () => {
-            try {
-                await port.close();
-            } catch (error) {
-                console.debug(error);
-            }
+        afterEach(() => {
+            return port.close();
         });
         test("should send basic data", async () => {
             const promise = port.transceive(sendData, 100);

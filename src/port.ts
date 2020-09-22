@@ -8,6 +8,7 @@ import {
 import { encodeFrame, decodeFrame, TERMINAL_BYTE } from "./encapsulation";
 import { BehaviorSubject, Subject } from "rxjs";
 import { PortBusy } from "./errors";
+import { promisify } from "util";
 
 /**
  * Encoding type for sending bytes
@@ -42,6 +43,14 @@ export class SerialPort implements Port {
      * Behavior subject which records if the port is busy
      */
     private busy: BehaviorSubject<boolean>;
+    /**
+     * Function to call node serialport open
+     */
+    private openAsync: () => Promise<void>;
+    /**
+     * Function to call node serialport close
+     */
+    private closeAsync: () => Promise<void>;
     /**
      * Write bytes to the serial port
      * @param bytes - Array of bytes to write
@@ -81,23 +90,27 @@ export class SerialPort implements Port {
             xoff: false,
             autoOpen: false,
         });
+        this.openAsync = promisify(this.port.open.bind(this.port));
+        this.closeAsync = promisify(this.port.close.bind(this.port));
         this.reader = createBytesSubject(this.port, "data");
         this.busy = new BehaviorSubject<boolean>(false);
     }
     /**
      * Open serial port
      */
-    open = (): Promise<void> =>
-        new Promise((resolve, reject) =>
-            this.port.open(error => (error ? reject(error) : resolve())),
-        );
+    async open(): Promise<void> {
+        if (!this.port.isOpen) {
+            await this.openAsync();
+        }
+    }
     /**
      * Close serial port
      */
-    close = (): Promise<void> =>
-        new Promise((resolve, reject) =>
-            this.port.close(error => (error ? reject(error) : resolve())),
-        );
+    async close(): Promise<void> {
+        if (this.port.isOpen) {
+            await this.closeAsync();
+        }
+    }
     /**
      * Send receive data with the port
      * @param requestFrame - Request frame to encode and send
