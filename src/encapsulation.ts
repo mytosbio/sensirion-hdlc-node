@@ -6,6 +6,8 @@ const ESCAPE_BYTE = 0x7d;
 
 const SPECIAL_BYTES = [0x7e, 0x7d, 0x11, 0x13];
 
+export const TERMINAL_BYTE = STOP_BYTE;
+
 /**
  * Flip the given bit of the provided byte
  * @param byte - Special byte which should be transformed

@@ -56,9 +56,11 @@ export const createBytesSubject = (
     eventName = "data",
 ): Subject<number> => {
     const subject = new Subject<number>();
-    eventEmitter.on(eventName, (chunk: Buffer) =>
-        chunk.forEach((byte: number) => subject.next(byte)),
-    );
+    eventEmitter.on(eventName, (chunk: Buffer) => {
+        if (chunk) {
+            chunk.forEach((byte: number) => subject.next(byte));
+        }
+    });
     return subject;
 };
 
