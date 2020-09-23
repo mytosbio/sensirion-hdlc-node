@@ -1,3 +1,6 @@
+// Global constants
+export const MILLISECONDS_PER_MINUTE = 1000 * 60;
+
 // Port constants
 export const BASE_RESPONSE_TIMEOUT = 100;
 
