@@ -5,22 +5,11 @@ import { OperatorFunction, ReplaySubject, Subject } from "rxjs";
 import { scan, first, timeout, catchError, tap } from "rxjs/operators";
 
 import { NoResponseTimeout } from "./errors";
+import { formatBytes } from "./format-utilities";
 
-// Create pino logger which is disabled in testing
-const logger = pino({ enabled: process.env.NODE_ENV !== "test" });
+// Create pino logger for port utilities
+const logger = pino({ name: "flow-meter:port-utilities" });
 
-/**
- * Format bytes for logging
- * @param bytes - Array of bytes
- * @param radix - Base for string formatting
- * @returns Formatted bytes as strings
- */
-const formatBytes = (bytes: number[], radix = 16): string => {
-    const prefixes = { 2: "0b", 16: "0x" };
-    const prefix = prefixes[radix as keyof typeof prefixes] || "";
-    const formatted = bytes.map(byte => `${prefix}${byte.toString(radix)}`);
-    return formatted.join(" ");
-};
 /**
  * Create an operator function to collect array values.
  * This operator function will emit the array for every new element

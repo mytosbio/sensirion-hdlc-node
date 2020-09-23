@@ -1,5 +1,5 @@
 import { Port } from "./port";
-import { NO_ERROR_STATE, Connection, RESEND_COMMAND_ID } from "./connection";
+import { Connection, RetryConnection } from "./connection";
 import { RequestFrameData } from "./message-frame";
 import {
     ChecksumInvalid,
@@ -9,8 +9,9 @@ import {
     SlaveAddressMismatch,
 } from "./errors";
 import { runAllTimersRecursive } from "./testing-utilities";
+import { NO_ERROR_STATE, RESEND_COMMAND_ID } from "./constants";
 
-describe("Connection", () => {
+describe("RetryConnection", () => {
     let connection: Connection;
     const mockTransceive = jest.fn();
     const mockPort: Port = {
@@ -20,7 +21,7 @@ describe("Connection", () => {
     };
     beforeEach(() => {
         jest.useFakeTimers();
-        connection = new Connection(mockPort);
+        connection = new RetryConnection(mockPort);
         Object.values(mockPort).forEach(fn => fn.mockReset());
     });
     describe(".transceive()", () => {

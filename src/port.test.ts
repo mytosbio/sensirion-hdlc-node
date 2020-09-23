@@ -2,10 +2,11 @@ import NodeSerialPort, { BaseBinding } from "serialport";
 
 import MockBinding from "@serialport/binding-mock";
 
-import { encodeFrame, decodeFrame, TERMINAL_BYTE } from "./encapsulation";
+import { encodeFrame, decodeFrame } from "./encapsulation";
 
 import { SerialPort } from "./port";
 import { NoResponseTimeout, PortBusy } from "./errors";
+import { TERMINAL_BYTE } from "./constants";
 
 NodeSerialPort.Binding = (MockBinding as any) as BaseBinding;
 

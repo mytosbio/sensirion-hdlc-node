@@ -1,6 +1,13 @@
 import pino from "pino";
 
-import { Port } from "./port";
+import { sleep } from "./async-utilities";
+
+import {
+    MAX_ERRORS,
+    RESEND_COMMAND_ID,
+    NO_ERROR_STATE,
+    RESEND_DELAY_MS,
+} from "./constants";
 
 import {
     RequestFrameData,
@@ -8,6 +15,8 @@ import {
     constructRequestFrame,
     deconstructResponseFrame,
 } from "./message-frame";
+
+import { Port } from "./port";
 
 import {
     ChecksumInvalid,
@@ -18,19 +27,20 @@ import {
     SlaveAddressMismatch,
     SlaveStateError,
 } from "./errors";
-import { sleep } from "./async-utilities";
 
-export const NO_ERROR_STATE = 0x00;
-export const RESEND_COMMAND_ID = 0xf2;
-export const RESEND_DELAY_MS = 100;
-export const MAX_ERRORS = 2;
+const logger = pino({ name: "flow-meter:connection" });
 
-const logger = pino();
+export interface Connection {
+    transceive(
+        requestData: RequestFrameData,
+        responseTimeout: number,
+    ): Promise<ResponseFrameData>;
+}
 
 /**
- * Connection represents a communication such as USB cable
+ * Retry connection uses a port to make repeated attempts at communication
  */
-export class Connection {
+export class RetryConnection implements Connection {
     /**
      *
      */

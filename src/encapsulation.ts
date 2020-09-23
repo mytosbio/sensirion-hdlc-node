@@ -1,12 +1,5 @@
+import { SPECIAL_BYTES, ESCAPE_BYTE, TERMINAL_BYTE } from "./constants";
 import { ChecksumInvalid } from "./errors";
-
-const START_BYTE = 0x7e;
-const STOP_BYTE = 0x7e;
-const ESCAPE_BYTE = 0x7d;
-
-const SPECIAL_BYTES = [0x7e, 0x7d, 0x11, 0x13];
-
-export const TERMINAL_BYTE = STOP_BYTE;
 
 /**
  * Flip the given bit of the provided byte
@@ -42,7 +35,7 @@ export const encodeFrame = (frame: number[]): number[] => {
                 : [byte],
         ),
     );
-    return [START_BYTE, ...escapedBytes, STOP_BYTE];
+    return [TERMINAL_BYTE, ...escapedBytes, TERMINAL_BYTE];
 };
 
 /**
@@ -53,12 +46,9 @@ export const encodeFrame = (frame: number[]): number[] => {
 export const decodeFrame = (received: number[]): number[] => {
     const decoded = [];
     let wasEscaped = false;
-    const lastIndex = received.length - 1;
     for (let i = 0; i < received.length; i++) {
-        if (received[i] == START_BYTE && i == 0) {
+        if (received[i] == TERMINAL_BYTE) {
             continue;
-        } else if (received[i] == STOP_BYTE && i == lastIndex) {
-            break;
         } else if (received[i] == ESCAPE_BYTE) {
             wasEscaped = true;
         } else if (wasEscaped) {

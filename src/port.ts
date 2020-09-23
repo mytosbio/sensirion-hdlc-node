@@ -1,3 +1,4 @@
+import pino from "pino";
 import NodeSerialPort from "serialport";
 
 import {
@@ -5,15 +6,18 @@ import {
     storeBytes,
     collectResponses,
 } from "./port-utilities";
-import { encodeFrame, decodeFrame, TERMINAL_BYTE } from "./encapsulation";
+import { encodeFrame, decodeFrame } from "./encapsulation";
 import { BehaviorSubject, Subject } from "rxjs";
 import { PortBusy } from "./errors";
 import { promisify } from "util";
+import { BASE_RESPONSE_TIMEOUT, TERMINAL_BYTE } from "./constants";
 
 /**
  * Encoding type for sending bytes
  */
 type Encoding = "base64" | "binary" | "hex";
+
+const logger = pino({ name: "flow-meter:port" });
 
 /**
  * Port is an interface with a type of data port
@@ -61,14 +65,17 @@ export class SerialPort implements Port {
         encoding: Encoding = "hex",
     ): Promise<null> =>
         new Promise((resolve, reject) => {
+            logger.debug("write bytes to port");
             this.port.write(bytes, encoding, error => {
                 if (error) {
                     reject(error);
                 } else {
+                    logger.debug("bytes written to port");
                     this.port.flush(error => {
                         if (error) {
                             reject(error);
                         } else {
+                            logger.debug("data flushed");
                             resolve();
                         }
                     });
@@ -122,6 +129,7 @@ export class SerialPort implements Port {
         responseTimeout: number,
     ): Promise<number[]> {
         if (this.busy.value) {
+            logger.warn("Post is busy");
             throw new PortBusy("Port is busy");
         }
         try {
@@ -132,7 +140,7 @@ export class SerialPort implements Port {
             const response = await collectResponses(
                 replaySubject,
                 TERMINAL_BYTE,
-                responseTimeout,
+                BASE_RESPONSE_TIMEOUT + responseTimeout,
             );
             return decodeFrame(response);
         } finally {
