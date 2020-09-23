@@ -97,7 +97,8 @@ export class RetryConnection implements Connection {
             ) {
                 // Send same command again after time delay
                 logger.warn(
-                    "Error making request %s (%s more errors allowed)",
+                    "%s when making request '%s' (%s more errors allowed)",
+                    error.name,
                     error.message,
                     allowedErrors,
                 );
@@ -114,7 +115,8 @@ export class RetryConnection implements Connection {
             ) {
                 // Send special resend command
                 logger.warn(
-                    "Error processing response %s (%s more errors allowed)",
+                    "%s when processing response '%s' (%s more errors allowed)",
+                    error.name,
                     error.message,
                     allowedErrors,
                 );
@@ -125,6 +127,7 @@ export class RetryConnection implements Connection {
                     allowedErrors - 1,
                 );
             } else {
+                logger.error("%s %s", error.name, error.message);
                 throw error;
             }
         }

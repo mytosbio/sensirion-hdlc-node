@@ -20,17 +20,17 @@
         "prettier": "prettier --prose-wrap always --write README.md",
         "sort-package-json": "sort-package-json",
         "test": "jest",
+        "test-changed": "jest --onlyChanged",
         "typedoc": "typedoc --out docs src"
     },
     "husky": {
         "hooks": {
-            "pre-commit": "yarn commit-hook"
+            "pre-commit": "npm-run-all commit-hook test-changed"
         }
     },
     "lint-staged": {
         "*.{js,ts,tsx}": [
-            "eslint --fix",
-            "jest --onlyChanged"
+            "eslint --fix"
         ],
         "*.{json,md}": [
             "prettier --prose-wrap always --write"

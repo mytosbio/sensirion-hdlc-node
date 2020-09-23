@@ -1,22 +1,30 @@
 /**
  * Incorrect data length
  */
-export class IncorrectDataLength extends Error {}
+export class IncorrectDataLength extends Error {
+    name = "IncorrectDataLength";
+}
 
 /**
  * Checksum invalid error
  */
-export class ChecksumInvalid extends Error {}
+export class ChecksumInvalid extends Error {
+    name = "ChecksumInvalid";
+}
 
 /**
  *
  */
-export class NoResponseTimeout extends Error {}
+export class NoResponseTimeout extends Error {
+    name = "NoResponseTimeout";
+}
 
 /**
  *
  */
-export class PortBusy extends Error {}
+export class PortBusy extends Error {
+    name = "PortBusy";
+}
 
 /**
  *
@@ -37,6 +45,7 @@ class ComparisonError<T> extends Error {
  *
  */
 export class SlaveAddressMismatch extends ComparisonError<number> {
+    name = "SlaveAddressMismatch";
     /**
      *
      * @param expectedAddress - Expected address
@@ -51,6 +60,7 @@ export class SlaveAddressMismatch extends ComparisonError<number> {
  *
  */
 export class CommandIdMismatch extends ComparisonError<number> {
+    name = "CommandIdMismatch";
     /**
      *
      * @param expectedCommand - Expected command
@@ -75,17 +85,25 @@ const ERROR_CODES = {
     0x24: "no measurement started",
 };
 
+type ErrorCode = keyof typeof ERROR_CODES;
+
+/**
+ * Get message for a given slave error code
+ * @param errorCode - Numeric error code
+ */
+const getSlaveStateErrorMessage = (errorCode: ErrorCode): string =>
+    ERROR_CODES[errorCode] || "unknown error";
+
 /**
  *
  */
 export class SlaveStateError extends Error {
+    name = "SlaveStateError";
     /**
      * Create a new slave state error
-     * @param errorState - State of error from sensor
+     * @param errorCode - State of error from sensor
      */
-    constructor(errorState: number) {
-        const errorCodesKey = errorState as keyof typeof ERROR_CODES;
-        const message = ERROR_CODES[errorCodesKey] || "unknown error";
-        super(message);
+    constructor(errorCode: number) {
+        super(getSlaveStateErrorMessage(errorCode as ErrorCode));
     }
 }
