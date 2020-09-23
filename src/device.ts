@@ -1,0 +1,150 @@
+import pino from "pino";
+
+import { Connection } from "./connection";
+import { MILLISECONDS_PER_MINUTE } from "./constants";
+import { parseSignedIntegerBytes } from "./data-utilities";
+import { formatBytes } from "./format-utilities";
+import { RequestFrameData } from "./message-frame";
+
+const logger = pino({ name: "flow-meter:device" });
+
+/**
+ * Device represents a Sensirion sensor
+ */
+export class Device {
+    private connection: Connection;
+    private slaveAddress: number;
+    /**
+     * Create a new device which uses a connection
+     * @param connection - Connection use to communicate
+     * @param slaveAddress - Address of device
+     */
+    constructor(connection: Connection, slaveAddress = 0x00) {
+        this.connection = connection;
+        this.slaveAddress = slaveAddress;
+    }
+    /**
+     * Make a device request and parse response
+     * @param commandId - Command id
+     * @param commandData - Command data
+     * @param responseTimeout - Response timeout
+     * @returns Parsed command data
+     */
+    protected async makeRequest(
+        commandId: number,
+        commandData: number[],
+        responseTimeout: number,
+    ): Promise<number[]> {
+        const slaveAddress = this.slaveAddress;
+        const requestData: RequestFrameData = {
+            slaveAddress,
+            commandId,
+            commandData,
+        };
+        const responseData = await this.connection.transceive(
+            requestData,
+            responseTimeout,
+        );
+        return responseData.commandData;
+    }
+    /**
+     * Get the name of the product
+     */
+    async getProductName(): Promise<string> {
+        const commandData = await this.makeRequest(0xd0, [0x01], 100);
+        return Buffer.from(commandData).toString("ascii");
+    }
+}
+
+/**
+ * SF06 Flow Meter
+ */
+export class FlowMeter extends Device {
+    /**
+     * Device specific scale factor
+     */
+    scaleFactor = 500;
+    /**
+     * Set the totalizer status to enabled or disabled
+     * @param status - Boolean status of totalizer
+     */
+    async setTotalizatorStatus(status: boolean): Promise<void> {
+        const commandData = [status ? 0x1 : 0x0];
+        await this.makeRequest(0x37, commandData, 1);
+    }
+    /**
+     * Reset the internal totalizer sum
+     */
+    async resetTotalizator(): Promise<void> {
+        await this.makeRequest(0x39, [], 1);
+    }
+    /**
+     * Start continuous measurements at the given interval
+     * @param interval - Interval between measurements
+     */
+    async startContinuousMeasurement(interval: number): Promise<void> {
+        const buffer = Buffer.alloc(2);
+        buffer.writeUIntBE(interval, 0, 2);
+        const commandData = [...buffer, 0x36, 0x08];
+        await this.makeRequest(0x33, commandData, 1);
+    }
+    /**
+     * Stop continuous measurements
+     */
+    async stopContinuousMeasurement(): Promise<void> {
+        await this.makeRequest(0x34, [], 1);
+    }
+    /**
+     * Get value of totalizer
+     */
+    async getLastMeasurement(): Promise<number> {
+        const commandData = await this.makeRequest(0x35, [], 1);
+        logger.info("value from last measurement %s", formatBytes(commandData));
+        return parseSignedIntegerBytes(commandData);
+    }
+    /**
+     * Get value of totalizer
+     */
+    async getTotalizatorValue(): Promise<number> {
+        const commandData = await this.makeRequest(0x38, [], 1);
+        logger.info("value from totalizer %s", formatBytes(commandData));
+        return parseSignedIntegerBytes(commandData);
+    }
+    /**
+     * Initialize the flow meter and set sensor type
+     */
+    async init(): Promise<void> {
+        logger.debug("Device reset");
+        await this.makeRequest(0xd3, [], 250);
+        logger.debug("Set sensor type");
+        await this.makeRequest(0x24, [0x03], 25);
+    }
+    /**
+     * Start recording volume flow
+     * @param interval - Interval in milliseconds between measurements
+     */
+    async startRecordingVolume(interval = 20): Promise<void> {
+        logger.debug("Set totalizator status");
+        await this.setTotalizatorStatus(true);
+        logger.debug("Reset totalizator");
+        await this.resetTotalizator();
+        logger.debug("Start continuous measurement");
+        await this.startContinuousMeasurement(interval);
+    }
+    /**
+     * Stop recording the volume flow
+     * @param interval - Interval in milliseconds between measurements
+     */
+    async stopRecordingVolume(interval = 20): Promise<number> {
+        logger.debug("Stop continuous measurement");
+        await this.stopContinuousMeasurement();
+        logger.debug("Get totalizator value");
+        const totalTicks = await this.getTotalizatorValue();
+        logger.info("totalTicks %s", totalTicks);
+        const samplingTime = interval / MILLISECONDS_PER_MINUTE;
+        logger.info("samplingTime %s", samplingTime);
+        const interimFlow = totalTicks / this.scaleFactor;
+        logger.info("interimFlow %s", interimFlow);
+        return interimFlow * samplingTime;
+    }
+}

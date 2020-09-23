@@ -1,3 +1,4 @@
+*.log
 *.pyc
 env
 node_modules
