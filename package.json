@@ -1,5 +1,5 @@
 {
-    "name": "sensirion-flow-meter",
+    "name": "@cytera/sensirion-hdlc",
     "version": "1.0.0",
     "license": "UNLICENSED",
     "author": "Cytera",
