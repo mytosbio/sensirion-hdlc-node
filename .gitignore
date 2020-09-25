@@ -1,4 +1,5 @@
 *.log
 *.pyc
 env
+dist
 node_modules
