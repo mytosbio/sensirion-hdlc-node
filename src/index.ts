@@ -5,6 +5,8 @@ import { SerialPort } from "./port";
 import { RetryConnection } from "./connection";
 import { FlowMeter } from "./device";
 
+export { FlowMeter, RetryConnection, SerialPort };
+
 const logger = pino({ name: "flow-meter:main" });
 
 /**
