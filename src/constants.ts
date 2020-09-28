@@ -2,7 +2,7 @@
 export const MILLISECONDS_PER_MINUTE = 1000 * 60;
 
 // Port constants
-export const BASE_RESPONSE_TIMEOUT = 100;
+export const BASE_RESPONSE_TIMEOUT = 320;
 
 // Encapsulation constants
 export const TERMINAL_BYTE = 0x7e;
