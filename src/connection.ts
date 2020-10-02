@@ -3,10 +3,10 @@ import pino from "pino";
 import { sleep } from "./async-utilities";
 
 import {
-    MAX_ERRORS,
+    MAX_SENSOR_ERRORS,
+    RESEND_DELAY_MS,
     RESEND_COMMAND_ID,
     NO_ERROR_STATE,
-    RESEND_DELAY_MS,
 } from "./constants";
 
 import {
@@ -61,7 +61,7 @@ export class RetryConnection implements Connection {
         requestData: RequestFrameData,
         responseTimeout: number,
         commandRequest = CommandRequest.Original,
-        allowedErrors = MAX_ERRORS,
+        allowedErrors = MAX_SENSOR_ERRORS,
     ): Promise<ResponseFrameData> {
         try {
             const thisSendData =
@@ -98,12 +98,12 @@ export class RetryConnection implements Connection {
             return responseData;
         } catch (error) {
             // If no more errors are allowed throw error
-            if (allowedErrors < 1) {
+            const remainingErrors = allowedErrors - 1;
+            if (remainingErrors < 1) {
                 logger.error("Allowed errors reached");
                 throw error;
             }
             // Log the number of remaining errors
-            const remainingErrors = allowedErrors - 1;
             logger.warn(
                 "%s: '%s' (%s more errors allowed)",
                 error.name,
