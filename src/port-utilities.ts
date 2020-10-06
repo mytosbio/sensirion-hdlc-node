@@ -82,7 +82,7 @@ export const collectResponses = (
         arrayScan<number>(),
         tap(bytes => logger.debug("bytes %s", formatBytes(bytes))),
         first(responseComplete(terminalByte)),
-        tap(bytes => logger.info("response %s", formatBytes(bytes))),
+        tap(bytes => logger.debug("response %s", formatBytes(bytes))),
         timeout(responseTimeout),
         catchError(timeoutErrorHandler(responseTimeout)),
     );

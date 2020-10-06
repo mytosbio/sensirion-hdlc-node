@@ -18,22 +18,23 @@ const main = async (path = "/dev/tty.usbserial-FT41NKFH"): Promise<void> => {
     const port = new SerialPort(path, 115200);
     const connection = new RetryConnection(port);
     const device = new FlowMeter(connection);
-    const measurementInterval = 20;
+    const measureInterval = 20;
     try {
         await port.open();
         const productName = await device.getProductName();
         logger.info("product name = %s", productName);
         await device.init();
-        await device.startRecordingVolume(measurementInterval);
-        logger.info("started recording volume");
-        for (const _ of Array(10).fill(null)) {
-            const lastMeasurement = await device.getLastMeasurement();
-            logger.info("last measurement = %s", lastMeasurement);
-            await sleep(1000);
+        for (const _ of Array(3).fill(null)) {
+            await device.startRecordingVolume(measureInterval);
+            logger.info("started recording volume");
+            for (const _ of Array(10).fill(null)) {
+                await device.getLastMeasurement();
+                await sleep(1000);
+            }
+            logger.info("stop recording volume");
+            const volume = await device.stopRecordingVolume(measureInterval);
+            logger.info("volume flow = %s", volume);
         }
-        logger.info("stop recording volume");
-        const volume = await device.stopRecordingVolume(measurementInterval);
-        logger.info("volume flow = %s", volume);
     } finally {
         await port.close();
     }

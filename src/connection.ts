@@ -3,10 +3,10 @@ import pino from "pino";
 import { sleep } from "./async-utilities";
 
 import {
-    MAX_ERRORS,
+    MAX_SENSOR_ERRORS,
+    RESEND_DELAY_MS,
     RESEND_COMMAND_ID,
     NO_ERROR_STATE,
-    RESEND_DELAY_MS,
 } from "./constants";
 
 import {
@@ -22,11 +22,11 @@ import {
     ChecksumInvalid,
     CommandIdMismatch,
     IncorrectDataLength,
-    NoResponseTimeout,
-    PortBusy,
     SlaveAddressMismatch,
     SlaveStateError,
 } from "./errors";
+
+import { formatBytes } from "./format-utilities";
 
 const logger = pino({ name: "flow-meter:connection" });
 
@@ -35,6 +35,11 @@ export interface Connection {
         requestData: RequestFrameData,
         responseTimeout: number,
     ): Promise<ResponseFrameData>;
+}
+
+enum CommandRequest {
+    Original = 0,
+    Resend = 1,
 }
 
 /**
@@ -48,26 +53,30 @@ export class RetryConnection implements Connection {
     /**
      * Internal function to send receive data and manage errors
      * @param requestData - Send data frame to transmit to sensor
-     * @param responseTimeout - Timeout to allow for response
-     * @param requestResend - True if special resend command should be sent
+     * @param responseTimeout - Timeout to allow for response from the sensor
+     * @param commandRequest - Declares if same command should be issued or resent command
      * @param allowedErrors - Number of allowed errors remaining
      */
     private async _transceive(
         requestData: RequestFrameData,
         responseTimeout: number,
-        requestResend = false,
-        allowedErrors = MAX_ERRORS,
+        commandRequest = CommandRequest.Original,
+        allowedErrors = MAX_SENSOR_ERRORS,
     ): Promise<ResponseFrameData> {
         try {
-            const thisSendData = requestResend
-                ? {
-                      slaveAddress: requestData.slaveAddress,
-                      commandId: RESEND_COMMAND_ID,
-                      commandData: [],
-                  }
-                : requestData;
+            const thisSendData =
+                commandRequest == CommandRequest.Resend
+                    ? {
+                          slaveAddress: requestData.slaveAddress,
+                          commandId: RESEND_COMMAND_ID,
+                          commandData: [],
+                      }
+                    : requestData;
             const requestFrame = constructRequestFrame(thisSendData);
-            logger.info("making request on port %s", thisSendData.commandId);
+            logger.info(
+                "making request command %s",
+                formatBytes([thisSendData.commandId]),
+            );
             const responseFrame = await this.port.transceive(
                 requestFrame,
                 responseTimeout,
@@ -88,47 +97,40 @@ export class RetryConnection implements Connection {
             }
             return responseData;
         } catch (error) {
-            if (allowedErrors < 1) {
+            // If no more errors are allowed throw error
+            const remainingErrors = allowedErrors - 1;
+            if (remainingErrors < 1) {
                 logger.error("Allowed errors reached");
                 throw error;
-            } else if (
-                error instanceof PortBusy ||
-                error instanceof NoResponseTimeout
-            ) {
-                // Send same command again after time delay
-                logger.warn(
-                    "%s when making request '%s' (%s more errors allowed)",
-                    error.name,
-                    error.message,
-                    allowedErrors,
-                );
-                await sleep(RESEND_DELAY_MS);
-                return this._transceive(
-                    requestData,
-                    responseTimeout,
-                    false,
-                    allowedErrors - 1,
-                );
-            } else if (
+            }
+            // Log the number of remaining errors
+            logger.warn(
+                "%s: '%s' (%s more errors allowed)",
+                error.name,
+                error.message,
+                remainingErrors,
+            );
+            // Check if response should be resent
+            if (
                 error instanceof ChecksumInvalid ||
                 error instanceof IncorrectDataLength
             ) {
                 // Send special resend command
-                logger.warn(
-                    "%s when processing response '%s' (%s more errors allowed)",
-                    error.name,
-                    error.message,
-                    allowedErrors,
-                );
                 return this._transceive(
                     requestData,
                     responseTimeout,
-                    true,
-                    allowedErrors - 1,
+                    CommandRequest.Resend,
+                    remainingErrors,
                 );
             } else {
-                logger.error("%s %s", error.name, error.message);
-                throw error;
+                // Send same request again after time delay
+                await sleep(RESEND_DELAY_MS);
+                return this._transceive(
+                    requestData,
+                    responseTimeout,
+                    CommandRequest.Original,
+                    remainingErrors,
+                );
             }
         }
     }
