@@ -10,9 +10,9 @@ const loadNumber = (name: string, defaultValue: number): number =>
 export const MILLISECONDS_PER_MINUTE = 1000 * 60;
 
 // Configurable constants
-export const BASE_RESPONSE_TIMEOUT = loadNumber("BASE_RESPONSE_TIMEOUT", 20);
-export const MAX_SENSOR_ERRORS = loadNumber("MAX_SENSOR_ERRORS", 3);
-export const RESEND_DELAY_MS = loadNumber("RESEND_DELAY_MS", 100);
+export const BASE_TIMEOUT = loadNumber("SENSIRION_BASE_TIMEOUT", 400);
+export const MAX_SENSOR_ERRORS = loadNumber("SENSIRION_MAX_SENSOR_ERRORS", 5);
+export const RESEND_DELAY_MS = loadNumber("SENSIRION_RESEND_DELAY_MS", 600);
 
 // Encapsulation constants
 export const TERMINAL_BYTE = 0x7e;

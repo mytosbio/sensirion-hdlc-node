@@ -9,8 +9,13 @@ import {
     SlaveAddressMismatch,
     SlaveStateError,
 } from "./errors";
+import {
+    MAX_SENSOR_ERRORS,
+    NO_ERROR_STATE,
+    RESEND_COMMAND_ID,
+} from "./constants";
+
 import { runAllTimersRecursive } from "./testing-utilities";
-import { NO_ERROR_STATE, RESEND_COMMAND_ID } from "./constants";
 
 describe("RetryConnection", () => {
     let connection: Connection;
@@ -57,7 +62,7 @@ describe("RetryConnection", () => {
                 0x00,
             ]);
             const promise = connection.transceive(requestData, requestTimeout);
-            await runAllTimersRecursive(3);
+            await runAllTimersRecursive(MAX_SENSOR_ERRORS);
             await expect(promise).rejects.toBeInstanceOf(SlaveAddressMismatch);
         });
         test("should fail when different command id returned", async () => {
@@ -68,7 +73,7 @@ describe("RetryConnection", () => {
                 0x00,
             ]);
             const promise = connection.transceive(requestData, requestTimeout);
-            await runAllTimersRecursive(3);
+            await runAllTimersRecursive(MAX_SENSOR_ERRORS);
             await expect(promise).rejects.toBeInstanceOf(CommandIdMismatch);
         });
         test("should resend special command after checksum error", async () => {
@@ -80,7 +85,7 @@ describe("RetryConnection", () => {
                 0x00,
             ]);
             const promise = connection.transceive(requestData, requestTimeout);
-            await runAllTimersRecursive(2);
+            await runAllTimersRecursive(MAX_SENSOR_ERRORS);
             await expect(promise).resolves.toEqual(
                 expect.objectContaining({
                     slaveAddress,
@@ -108,7 +113,7 @@ describe("RetryConnection", () => {
                 0x00,
             ]);
             const promise = connection.transceive(requestData, requestTimeout);
-            await runAllTimersRecursive(3);
+            await runAllTimersRecursive(MAX_SENSOR_ERRORS);
             await expect(promise).resolves.toEqual(
                 expect.objectContaining({
                     slaveAddress,
@@ -126,7 +131,7 @@ describe("RetryConnection", () => {
                 0x00,
             ]);
             const promise = connection.transceive(requestData, requestTimeout);
-            await runAllTimersRecursive(2);
+            await runAllTimersRecursive(MAX_SENSOR_ERRORS);
             await expect(promise).resolves.toEqual(
                 expect.objectContaining({
                     slaveAddress,
@@ -138,9 +143,9 @@ describe("RetryConnection", () => {
         test("should fail with no response timeout when after multi fail", async () => {
             mockTransceive.mockRejectedValue(new NoResponseTimeout("timeout"));
             const promise = connection.transceive(requestData, requestTimeout);
-            await runAllTimersRecursive();
+            await runAllTimersRecursive(MAX_SENSOR_ERRORS);
             await expect(promise).rejects.toBeInstanceOf(NoResponseTimeout);
-            expect(mockTransceive).toHaveBeenCalledTimes(3);
+            expect(mockTransceive).toHaveBeenCalledTimes(MAX_SENSOR_ERRORS);
         });
     });
 });

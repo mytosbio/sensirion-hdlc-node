@@ -10,7 +10,7 @@ import { encodeFrame, decodeFrame } from "./encapsulation";
 import { BehaviorSubject, Subject } from "rxjs";
 import { PortBusy } from "./errors";
 import { promisify } from "util";
-import { BASE_RESPONSE_TIMEOUT, TERMINAL_BYTE } from "./constants";
+import { BASE_TIMEOUT, TERMINAL_BYTE } from "./constants";
 
 /**
  * Encoding type for sending bytes
@@ -140,7 +140,7 @@ export class SerialPort implements Port {
             const response = await collectResponses(
                 replaySubject,
                 TERMINAL_BYTE,
-                BASE_RESPONSE_TIMEOUT + responseTimeout,
+                BASE_TIMEOUT + responseTimeout,
             );
             return decodeFrame(response);
         } finally {
