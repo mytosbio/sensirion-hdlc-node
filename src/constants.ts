@@ -2,17 +2,21 @@
  * Load a number from environment variables
  * @param name - Name of environment variable
  * @param defaultValue - Default value of number
+ * @param env - Node process environment
  */
-const loadNumber = (name: string, defaultValue: number): number =>
-    name in process.env ? Number(process.env[name]) : defaultValue;
+export const loadNumber = (
+    name: string,
+    defaultValue: number,
+    env = process.env,
+): number => (name in env ? Number(env[name]) : defaultValue);
 
 // Global constants
 export const MILLISECONDS_PER_MINUTE = 1000 * 60;
 
 // Configurable constants
-export const BASE_TIMEOUT = loadNumber("SENSIRION_BASE_TIMEOUT", 400);
-export const MAX_SENSOR_ERRORS = loadNumber("SENSIRION_MAX_SENSOR_ERRORS", 5);
-export const RESEND_DELAY_MS = loadNumber("SENSIRION_RESEND_DELAY_MS", 600);
+export const BASE_TIMEOUT = loadNumber("SENSIRION_BASE_TIMEOUT", 32);
+export const MAX_SENSOR_ERRORS = loadNumber("SENSIRION_MAX_SENSOR_ERRORS", 3);
+export const RESEND_DELAY_MS = loadNumber("SENSIRION_RESEND_DELAY_MS", 100);
 
 // Encapsulation constants
 export const TERMINAL_BYTE = 0x7e;

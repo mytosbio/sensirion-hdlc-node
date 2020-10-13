@@ -116,6 +116,7 @@ export class RetryConnection implements Connection {
                 error instanceof IncorrectDataLength
             ) {
                 // Send special resend command
+                logger.warn("send special resend command");
                 return this._transceive(
                     requestData,
                     responseTimeout,
@@ -124,6 +125,7 @@ export class RetryConnection implements Connection {
                 );
             } else {
                 // Send same request again after time delay
+                logger.warn("send same command again after delay");
                 await sleep(RESEND_DELAY_MS);
                 return this._transceive(
                     requestData,
