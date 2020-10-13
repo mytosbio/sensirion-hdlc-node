@@ -271,10 +271,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@hackscience/prettier-config@^1.0.1":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@hackscience/prettier-config/-/prettier-config-1.0.3.tgz#5c2cc79063ddac9e0c375bbe871ff9b401f416eb"
-  integrity sha512-K5vbXXOTsw399qvhR4L45YjreGnVLWg1LekHFTKBHDgLgkOmbQXuLKeGkLPPkFDDw25EP9aIgHNGGFf8EII3Jw==
+"@cytera/prettier-config@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@cytera/prettier-config/-/prettier-config-1.0.0.tgz#02880a705728da31bef00140f3e17b261dfff0c9"
+  integrity sha512-c2L+xwNfackA2T5gLo6CCl50ADZelN+5nmXofbmjCeaCIgIvbyzrqjtulZvR8GIEFkSDeO4r6q+OzontWY2BAg==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
