@@ -125,8 +125,9 @@ export class RetryConnection implements Connection {
                 );
             } else {
                 // Send same request again after time delay
-                logger.warn("send same command again after delay");
+                logger.warn("delay %s ms before resend", RESEND_DELAY_MS);
                 await sleep(RESEND_DELAY_MS);
+                logger.warn("send original command again");
                 return this._transceive(
                     requestData,
                     responseTimeout,

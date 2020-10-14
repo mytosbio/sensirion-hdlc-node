@@ -13,7 +13,10 @@ export { FlowMeter, RetryConnection, SerialPort };
 // Constants used to control testing
 const CALCULATION_ARRAY_LENGTH = loadNumber("CALCULATION_ARRAY_LENGTH", 10000);
 const GET_MEASUREMENT_INTERVAL = loadNumber("GET_MEASUREMENT_INTERVAL", 1000);
+
+const NUMBER_FLOW_RECORD = loadNumber("NUMBER_FLOW_RECORD", 5);
 const RECORD_FLOW_DURATION = loadNumber("RECORD_FLOW_DURATION", 10000);
+const INTER_RECORD_DURATION = loadNumber("INTER_RECORD_DURATION", 100);
 
 const logger = pino({ name: "flow-meter:main" });
 
@@ -58,7 +61,8 @@ const testSensorDevice = async (
     }
     const interval = setInterval(async () => {
         try {
-            await sensorDevice.getLastMeasurement();
+            await sensorDevice.getCurrentFlowRate();
+            await sensorDevice.getTotalVolume();
         } catch (error) {
             logger.error("get last measurement error %s", error.message);
         }
@@ -67,8 +71,10 @@ const testSensorDevice = async (
         await sensorPort.open();
         const productName = await sensorDevice.getProductName();
         logger.info("product name = %s", productName);
+        const sensorPartName = await sensorDevice.getSensorPartName();
+        logger.info("sensor part name = %s", sensorPartName);
         await sensorDevice.init();
-        for (const _ of Array(3).fill(null)) {
+        for (const _ of Array(NUMBER_FLOW_RECORD).fill(null)) {
             await sensorDevice.startRecordingVolume(measureInterval);
             logger.info("started recording volume");
             await sleep(RECORD_FLOW_DURATION);
@@ -77,6 +83,7 @@ const testSensorDevice = async (
                 measureInterval,
             );
             logger.info("volume flow = %s", volume);
+            await sleep(INTER_RECORD_DURATION);
         }
     } finally {
         clearInterval(interval);
