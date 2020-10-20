@@ -4,7 +4,7 @@ import { sleep } from "./async-utilities";
 
 import {
     MAX_SENSOR_ERRORS,
-    RESEND_DELAY_MS,
+    RESEND_DELAY,
     RESEND_COMMAND_ID,
     NO_ERROR_STATE,
 } from "./constants";
@@ -125,8 +125,8 @@ export class RetryConnection implements Connection {
                 );
             } else {
                 // Send same request again after time delay
-                logger.warn("delay %s ms before resend", RESEND_DELAY_MS);
-                await sleep(RESEND_DELAY_MS);
+                logger.warn("delay %s ms before resend", RESEND_DELAY);
+                await sleep(RESEND_DELAY);
                 logger.warn("send original command again");
                 return this._transceive(
                     requestData,

@@ -69,11 +69,11 @@ const testSensorDevice = async (
     }, GET_MEASUREMENT_INTERVAL);
     try {
         await sensorPort.open();
+        await sensorDevice.init();
         const productName = await sensorDevice.getProductName();
         logger.info("product name = %s", productName);
         const sensorPartName = await sensorDevice.getSensorPartName();
         logger.info("sensor part name = %s", sensorPartName);
-        await sensorDevice.init();
         for (const _ of Array(NUMBER_FLOW_RECORD).fill(null)) {
             await sensorDevice.startRecordingVolume(measureInterval);
             logger.info("started recording volume");

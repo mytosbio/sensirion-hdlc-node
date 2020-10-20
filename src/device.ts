@@ -3,7 +3,7 @@ import { sleep } from "./async-utilities";
 
 import { Connection } from "./connection";
 import { MILLISECONDS_PER_MINUTE } from "./constants";
-import { parseSignedIntegerBytes } from "./data-utilities";
+import { parseStringBytes, parseSignedIntegerBytes } from "./data-utilities";
 import { formatBytes } from "./format-utilities";
 import { RequestFrameData } from "./message-frame";
 
@@ -53,7 +53,7 @@ export class Device {
      */
     async getProductName(): Promise<string> {
         const commandData = await this.makeRequest(0xd0, [0x01], 100);
-        return Buffer.from(commandData).toString("ascii");
+        return parseStringBytes(commandData);
     }
 }
 
@@ -70,7 +70,7 @@ export class FlowMeter extends Device {
      */
     async getSensorPartName(): Promise<string> {
         const commandData = await this.makeRequest(0x50, [], 3);
-        return Buffer.from(commandData).toString("ascii");
+        return parseStringBytes(commandData);
     }
     /**
      * Set the totalizer status to enabled or disabled

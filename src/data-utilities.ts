@@ -1,4 +1,11 @@
 /**
+ * Parse bytes to a string
+ * @param bytes - Array of bytes to parse to string
+ */
+export const parseStringBytes = (bytes: number[]): string =>
+    Buffer.from(bytes).toString("ascii").replace(/\0/, "");
+
+/**
  * Parse bytes which represent an unsigned integer
  * @param bytes - Array of bytes encoding an unsigned integer
  */
