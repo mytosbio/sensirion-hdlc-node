@@ -3,7 +3,7 @@ import { sleep } from "./async-utilities";
 
 import { Connection } from "./connection";
 import { MILLISECONDS_PER_MINUTE } from "./constants";
-import { parseSignedIntegerBytes } from "./data-utilities";
+import { parseStringBytes, parseSignedIntegerBytes } from "./data-utilities";
 import { formatBytes } from "./format-utilities";
 import { RequestFrameData } from "./message-frame";
 
@@ -53,7 +53,7 @@ export class Device {
      */
     async getProductName(): Promise<string> {
         const commandData = await this.makeRequest(0xd0, [0x01], 100);
-        return Buffer.from(commandData).toString("ascii");
+        return parseStringBytes(commandData);
     }
 }
 
@@ -65,6 +65,13 @@ export class FlowMeter extends Device {
      * Device specific scale factor
      */
     scaleFactor = 500;
+    /**
+     * Get sensor part name
+     */
+    async getSensorPartName(): Promise<string> {
+        const commandData = await this.makeRequest(0x50, [], 3);
+        return parseStringBytes(commandData);
+    }
     /**
      * Set the totalizer status to enabled or disabled
      * @param status - Boolean status of totalizer
@@ -125,6 +132,11 @@ export class FlowMeter extends Device {
         await sleep(100);
         logger.info("set sensor type");
         await this.makeRequest(0x24, [0x03], 25);
+        logger.info("get scale factor and unit");
+        const mlPerMin = 8 * 256 + 4 * 16 + 5;
+        logger.info("target scale factor %s", mlPerMin.toString(16));
+        const scaleFactorUnit = await this.makeRequest(0x53, [0, 0], 1);
+        logger.info("scale factor %s", formatBytes(scaleFactorUnit));
     }
     /**
      * Start recording volume flow
@@ -140,21 +152,39 @@ export class FlowMeter extends Device {
         logger.info("started recording volume");
     }
     /**
+     * Get current flow rate
+     */
+    async getCurrentFlowRate(): Promise<number> {
+        const lastMeasurement = await this.getLastMeasurement();
+        const flowRate = lastMeasurement / this.scaleFactor;
+        logger.info("flow rate = %s", flowRate);
+        return flowRate;
+    }
+    /**
+     * Get total volume from totalizer
+     * @param interval - Read interval in milliseconds
+     */
+    async getTotalVolume(interval = 20): Promise<number> {
+        logger.debug("get totalizator value");
+        const totalTicks = await this.getTotalizatorValue();
+        logger.debug("total ticks %s", totalTicks);
+        const samplingTime = interval / MILLISECONDS_PER_MINUTE;
+        logger.debug("sampling time %s", samplingTime);
+        const interimFlow = totalTicks / this.scaleFactor;
+        logger.debug("interim flow %s", interimFlow);
+        const volume = interimFlow * samplingTime;
+        logger.info("total volume = %s", volume);
+        return volume;
+    }
+    /**
      * Stop recording the volume flow
      * @param interval - Interval in milliseconds between measurements
      */
     async stopRecordingVolume(interval = 20): Promise<number> {
         logger.debug("stop continuous measurement");
         await this.stopContinuousMeasurement();
-        logger.debug("get totalizator value");
-        const totalTicks = await this.getTotalizatorValue();
-        logger.debug("totalTicks %s", totalTicks);
-        const samplingTime = interval / MILLISECONDS_PER_MINUTE;
-        logger.debug("samplingTime %s", samplingTime);
-        const interimFlow = totalTicks / this.scaleFactor;
-        logger.debug("interimFlow %s", interimFlow);
-        const volume = interimFlow * samplingTime;
-        logger.info("total volume = %s", volume);
+        const volume = await this.getTotalVolume(interval);
+        logger.info("stopped recording volume");
         return volume;
     }
 }

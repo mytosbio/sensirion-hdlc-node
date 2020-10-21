@@ -10,7 +10,8 @@ import { encodeFrame, decodeFrame } from "./encapsulation";
 import { BehaviorSubject, Subject } from "rxjs";
 import { PortBusy } from "./errors";
 import { promisify } from "util";
-import { BASE_TIMEOUT, TERMINAL_BYTE } from "./constants";
+import { TERMINAL_BYTE } from "./constants";
+import { formatBytes } from "./format-utilities";
 
 /**
  * Encoding type for sending bytes
@@ -129,7 +130,10 @@ export class SerialPort implements Port {
         responseTimeout: number,
     ): Promise<number[]> {
         if (this.busy.value) {
-            logger.warn("Post is busy");
+            logger.warn(
+                "port is busy when sending %s",
+                formatBytes(requestFrame),
+            );
             throw new PortBusy("Port is busy");
         }
         try {
@@ -140,7 +144,7 @@ export class SerialPort implements Port {
             const response = await collectResponses(
                 replaySubject,
                 TERMINAL_BYTE,
-                BASE_TIMEOUT + responseTimeout,
+                responseTimeout,
             );
             return decodeFrame(response);
         } finally {

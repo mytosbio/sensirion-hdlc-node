@@ -1,6 +1,6 @@
 {
     "name": "@cytera/sensirion-hdlc",
-    "version": "1.0.0-3",
+    "version": "1.0.0-4",
     "license": "UNLICENSED",
     "author": "Cytera",
     "main": "dist/index.js",
@@ -42,16 +42,18 @@
             "sort-package-json"
         ]
     },
-    "prettier": "@hackscience/prettier-config",
+    "prettier": "@cytera/prettier-config",
     "dependencies": {
+        "@types/argparse": "^2.0.2",
         "@types/pino": "^6.0.1",
         "@types/serialport": "^8.0.1",
+        "argparse": "^2.0.1",
         "pino": "^6.2.1",
         "rxjs": "^6.6.3",
         "serialport": "^9.0.1"
     },
     "devDependencies": {
-        "@hackscience/prettier-config": "^1.0.1",
+        "@cytera/prettier-config": "^1.0.0",
         "@types/jest": "^25.2.1",
         "@types/node": "^13.11.1",
         "@typescript-eslint/eslint-plugin": "^2.28.0",

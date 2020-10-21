@@ -7,6 +7,8 @@ import {
     collectResponses,
 } from "./port-utilities";
 import { NoResponseTimeout } from "./errors";
+import { sleep } from "./async-utilities";
+import { INTERBYTE_TIMEOUT, MIN_RESPONSE_TIMEOUT } from "./constants";
 
 describe("PortUtilities", () => {
     describe("createBytesSubject()", () => {
@@ -69,6 +71,14 @@ describe("PortUtilities", () => {
             replaySubject.next(terminal);
             await expect(promise).rejects.toBeInstanceOf(NoResponseTimeout);
         });
+        test("should timeout if long delay between start and end", async () => {
+            const promise = collectResponses(replaySubject, terminal, 100);
+            promise.catch(() => null);
+            replaySubject.next(terminal);
+            await sleep(INTERBYTE_TIMEOUT + 10);
+            replaySubject.next(terminal);
+            await expect(promise).rejects.toBeInstanceOf(NoResponseTimeout);
+        });
         test("should return array including all bytes received after collection", async () => {
             const promise = collectResponses(replaySubject, terminal, 100);
             replaySubject.next(terminal);
@@ -82,6 +92,23 @@ describe("PortUtilities", () => {
             replaySubject.next(terminal);
             const promise = collectResponses(replaySubject, terminal, 100);
             await expect(promise).resolves.toEqual([terminal, 0xcd, terminal]);
+        });
+        test("should return array when delay between byte transmission", async () => {
+            const promise = collectResponses(replaySubject, terminal, 100);
+            await sleep(MIN_RESPONSE_TIMEOUT - 10);
+            replaySubject.next(terminal);
+            await sleep(INTERBYTE_TIMEOUT - 10);
+            replaySubject.next(0xab);
+            await sleep(INTERBYTE_TIMEOUT - 10);
+            replaySubject.next(0xcd);
+            await sleep(INTERBYTE_TIMEOUT - 10);
+            replaySubject.next(terminal);
+            await expect(promise).resolves.toEqual([
+                terminal,
+                0xab,
+                0xcd,
+                terminal,
+            ]);
         });
     });
 });

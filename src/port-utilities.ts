@@ -3,19 +3,25 @@ import { EventEmitter } from "events";
 import pino from "pino";
 import { OperatorFunction, ReplaySubject, Subject } from "rxjs";
 import { scan, first, timeout, catchError, tap } from "rxjs/operators";
+import { INTERBYTE_TIMEOUT, MIN_RESPONSE_TIMEOUT } from "./constants";
 
 import { NoResponseTimeout } from "./errors";
 import { formatBytes } from "./format-utilities";
+import { arrayScan, timeoutBetween } from "./observable-utilities";
 
 // Create pino logger for port utilities
 const logger = pino({ name: "flow-meter:port-utilities" });
 
 /**
- * Create an operator function to collect array values.
- * This operator function will emit the array for every new element
+ * Get the timeout for a given command
+ * @param responseTimeMax - Command defined max response time
+ * @param minResponseTimeout - Non real time system min response timeout
+ * @returns Slave response timeout
  */
-const arrayScan = <T>(): OperatorFunction<T, T[]> =>
-    scan<T, T[]>((acc, curr) => [...acc, curr], []);
+const getSlaveResponseTimeout = (
+    responseTimeMax: number,
+    minResponseTimeout = MIN_RESPONSE_TIMEOUT,
+): number => Math.max(2 * responseTimeMax, minResponseTimeout);
 
 /**
  * Create a predicate function to check if the response is complete
@@ -28,9 +34,10 @@ const responseComplete = (terminalByte: number) => (bytes: number[]): boolean =>
  * Create an error handler for a response timeout
  * @param responseTimeout - Timeout in milliseconds after which request fails
  */
-const timeoutErrorHandler = (responseTimeout: number) => (error: Error) => {
+const timeoutErrorHandler = (startTimestamp: number) => (error: Error): [] => {
+    const duration = Date.now() - startTimestamp;
     logger.info("timeout during response collection %s", error.message);
-    const errorMessage = `Response not complete after ${responseTimeout}`;
+    const errorMessage = `Response not complete after ${duration}ms`;
     throw new NoResponseTimeout(errorMessage);
 };
 
@@ -70,21 +77,24 @@ export const storeBytes = (
  * Collect responses and return an array or bytes
  * @param bytesReplaySubject - Subject of bytes received
  * @param terminalByte - Byte which signifies the start or end
- * @param timeoutMilliseconds - Timeout after which an error is thrown
+ * @param responseTimeMax - Timeout after which an error is thrown
  * @returns Array including all bytes received
  */
 export const collectResponses = (
     bytesReplaySubject: ReplaySubject<number>,
     terminalByte: number,
-    responseTimeout: number,
+    responseTimeMax: number,
 ): Promise<number[]> => {
+    const startTimestamp = Date.now();
+    const slaveResponseTimeout = getSlaveResponseTimeout(responseTimeMax);
     const responseObservable = bytesReplaySubject.pipe(
+        timeout(slaveResponseTimeout),
+        timeoutBetween(INTERBYTE_TIMEOUT),
+        catchError(timeoutErrorHandler(startTimestamp)),
         arrayScan<number>(),
         tap(bytes => logger.debug("bytes %s", formatBytes(bytes))),
         first(responseComplete(terminalByte)),
         tap(bytes => logger.debug("response %s", formatBytes(bytes))),
-        timeout(responseTimeout),
-        catchError(timeoutErrorHandler(responseTimeout)),
     );
     return responseObservable.toPromise();
 };

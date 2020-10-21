@@ -271,10 +271,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@hackscience/prettier-config@^1.0.1":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@hackscience/prettier-config/-/prettier-config-1.0.3.tgz#5c2cc79063ddac9e0c375bbe871ff9b401f416eb"
-  integrity sha512-K5vbXXOTsw399qvhR4L45YjreGnVLWg1LekHFTKBHDgLgkOmbQXuLKeGkLPPkFDDw25EP9aIgHNGGFf8EII3Jw==
+"@cytera/prettier-config@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@cytera/prettier-config/-/prettier-config-1.0.0.tgz#02880a705728da31bef00140f3e17b261dfff0c9"
+  integrity sha512-c2L+xwNfackA2T5gLo6CCl50ADZelN+5nmXofbmjCeaCIgIvbyzrqjtulZvR8GIEFkSDeO4r6q+OzontWY2BAg==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -586,6 +586,11 @@
     structured-source "^3.0.2"
     traverse "^0.6.6"
     unified "^6.1.6"
+
+"@types/argparse@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/@types/argparse/-/argparse-2.0.2.tgz#4eb7e626975ff2526a08a12db5e6cc303807e657"
+  integrity sha512-z5yKiFv9jZLXfjLzbPq2Zv0PboFDBZ2NKNs7kC/+AIfqKYcGqGw2ukL0q0NbgCs/ShTTRx+A0/VR+DLnGhAWtw==
 
 "@types/babel__core@^7.1.7":
   version "7.1.9"
@@ -971,6 +976,11 @@ argparse@^1.0.7:
   integrity sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==
   dependencies:
     sprintf-js "~1.0.2"
+
+argparse@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
+  integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
 arr-diff@^4.0.0:
   version "4.0.0"
