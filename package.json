@@ -1,8 +1,8 @@
 {
     "name": "@cytera/sensirion-hdlc",
     "version": "1.0.0-4",
-    "license": "UNLICENSED",
-    "author": "Cytera",
+    "license": "MIT",
+    "author": "Cytera CellWorks",
     "main": "dist/index.js",
     "source": "src/index.ts",
     "types": "dist/index.d.js",
