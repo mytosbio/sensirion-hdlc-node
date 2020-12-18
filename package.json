@@ -21,7 +21,7 @@
         "sort-package-json": "sort-package-json",
         "test": "jest",
         "test-changed": "jest --onlyChanged",
-        "typedoc": "typedoc --out docs src"
+        "typedoc": "typedoc"
     },
     "husky": {
         "hooks": {
