@@ -1,15 +1,13 @@
 name: Test
 on: [push]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install modules
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn
-      - name: Run tests
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn test
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install modules
+              run: yarn
+            - name: Lint repository
+              run: yarn run eslint .
+            - name: Run tests
+              run: yarn run test
