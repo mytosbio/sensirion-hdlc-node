@@ -1,0 +1,259 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@cytera/sensirion-hdlc</title>
+	<meta name="description" content="Documentation for @cytera/sensirion-hdlc">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@cytera/sensirion-hdlc</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@cytera/sensirion-hdlc</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#sensirion-hdlc-node" id="sensirion-hdlc-node" style="color: inherit; text-decoration: none;">
+					<h1>Sensirion HDLC Node</h1>
+				</a>
+				<p>Node driver for Sensirion HDLC devices. This package is largely modeled after
+				<a href="https://github.com/Sensirion/python-shdlc-driver">Sensirion/python-shdlc-driver: Python Driver for Sensirion SHDLC Devices</a>.</p>
+				<blockquote>
+					<p>Please note Cytera CellWorks has no affiliation with Sensirion.</p>
+				</blockquote>
+				<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+				<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+				<ul>
+					<li><a href="#limitations">Limitations</a></li>
+					<li><a href="#usage">Usage</a><ul>
+							<li><a href="#installation">Installation</a></li>
+							<li><a href="#working-example">Working example</a></li>
+						</ul>
+					</li>
+					<li><a href="#development">Development</a><ul>
+							<li><a href="#running-tests">Running tests</a></li>
+							<li><a href="#building-documentation">Building documentation</a></li>
+						</ul>
+					</li>
+					<li><a href="#license">License</a></li>
+				</ul>
+				<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+				<a href="#limitations" id="limitations" style="color: inherit; text-decoration: none;">
+					<h2>Limitations</h2>
+				</a>
+				<p>Currently this package only includes commands to communicate with the Liquid
+					Flow Sensor using the Sensirion RS485 and USB Sensor Cable. For more information
+					on either of the products this package is designed to work with please refer to
+				the following links.</p>
+				<ul>
+					<li><a href="https://www.sensirion.com/en/flow-sensors/liquid-flow-meters/page/next-generation-liquid-flow-sensor-for-life-science-and-analytical-instruments/">Liquid Flow Sensor SLF3x | Sensirion</a></li>
+					<li><a href="https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/4_Liquid_Flow_Meters/Liquid_Flow/Sensirion_Liquid_Flow_Meters_SCC1-RS485_Sensor_Cable_Datasheet.pdf">Sensirion_Liquid_Flow_Meters_SCC1-RS485_Sensor_Cable_Datasheet.pdf</a></li>
+				</ul>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h3>Installation</h3>
+				</a>
+				<p>Install using npm or yarn.</p>
+				<pre><code><span class="hljs-built_in">npm</span> install @cytera/sensirion-hdlc
+yarn add @cytera/sensirion-hdlc</code></pre>
+				<a href="#working-example" id="working-example" style="color: inherit; text-decoration: none;">
+					<h3>Working example</h3>
+				</a>
+				<p>To communicate with a sensor the interfaces port, connection and device are
+					used. The port is responsible for sending a receiving data between the computer
+					and sensor. The connection manages resending requests and checking that a full
+					response is received. A device uses a connection to provide an API to the
+				connected sensor.</p>
+				<p>Here is an example for the SLF06 flow meter measuring the fluid volume which has
+					passed through the sensor. In this example the sensor cable totalizer is used to
+					collect the instantaneous flow measurements over a period of time. Then once
+				1000ms has passed the totalizer value is read from the sensor.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { SerialPort, RetryConnection, FlowMeter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@cytera/sensirion-hdlc&quot;</span>;
+
+<span class="hljs-keyword">const</span> measureInterval = <span class="hljs-number">20</span>;
+<span class="hljs-keyword">const</span> sensorPath = <span class="hljs-string">&quot;/dev/sensor&quot;</span>;
+<span class="hljs-keyword">const</span> sensorPort = <span class="hljs-keyword">new</span> SerialPort(sensorPath, <span class="hljs-number">115200</span>);
+<span class="hljs-keyword">const</span> sensorConnection = <span class="hljs-keyword">new</span> RetryConnection(sensorPort);
+<span class="hljs-keyword">const</span> sensorDevice = <span class="hljs-keyword">new</span> FlowMeter(sensorConnection);
+
+<span class="hljs-keyword">const</span> main = <span class="hljs-keyword">async</span> () =&gt; {
+  <span class="hljs-keyword">await</span> sensorPort.open();
+  <span class="hljs-keyword">await</span> sensorDevice.init();
+  <span class="hljs-keyword">const</span> productName = <span class="hljs-keyword">await</span> sensorDevice.getProductName();
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;productName&quot;</span>, productName);
+  <span class="hljs-keyword">await</span> sensorDevice.startRecordingVolume(measureInterval);
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> <span class="hljs-built_in">setTimeout</span>(resolve, <span class="hljs-number">1000</span>));
+  <span class="hljs-keyword">const</span> volume = <span class="hljs-keyword">await</span> sensorDevice.stopRecordingVolume(measureInterval);
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;volume&quot;</span>, volume);
+  <span class="hljs-keyword">await</span> sensorPort.close();
+};
+
+main();</code></pre>
+				<a href="#development" id="development" style="color: inherit; text-decoration: none;">
+					<h2>Development</h2>
+				</a>
+				<p>Please feel free to fork and modify this code. We have attempted to add some
+					basic cde quality checks to the process. When creating commits the Typescript
+					files are built and linted to check they conform to the correct standards. If
+					using VSCode then we highly recommend installing the prettier and eslint
+				extensions.</p>
+				<a href="#running-tests" id="running-tests" style="color: inherit; text-decoration: none;">
+					<h3>Running tests</h3>
+				</a>
+				<p>There are extensive tests to assert correct functionality. The test runner used
+					is <code>jest</code> which accepts a number of arguments to watch the test files and filter
+					tests based on filename. The following command will run all the tests for the
+				reposiotory.</p>
+				<pre><code>yarn <span class="hljs-keyword">run</span><span class="bash"> <span class="hljs-built_in">test</span></span></code></pre>
+				<a href="#building-documentation" id="building-documentation" style="color: inherit; text-decoration: none;">
+					<h3>Building documentation</h3>
+				</a>
+				<p>Documentation can be built using typedoc.</p>
+				<pre><code>yarn <span class="hljs-keyword">run</span><span class="bash"> typedoc</span></code></pre>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>Please see <a href="LICENSE">LICENSE</a>.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_async_utilities_.html">&quot;async-<wbr>utilities&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_connection_.html">&quot;connection&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_constants_.html">&quot;constants&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_data_utilities_.html">&quot;data-<wbr>utilities&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_device_.html">&quot;device&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_encapsulation_.html">&quot;encapsulation&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_errors_.html">&quot;errors&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_format_utilities_.html">&quot;format-<wbr>utilities&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_message_frame_.html">&quot;message-<wbr>frame&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_observable_utilities_.html">&quot;observable-<wbr>utilities&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_port_.html">&quot;port&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_port_utilities_.html">&quot;port-<wbr>utilities&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_testing_utilities_.html">&quot;testing-<wbr>utilities&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
