@@ -1,5 +1,8 @@
 # Sensirion HDLC Node
 
+![Build lint test](https://github.com/cytera/sensirion-hdlc-node/workflows/Build%20lint%20test/badge.svg)
+![Publish to GitHub Pages](https://github.com/cytera/sensirion-hdlc-node/workflows/Publish%20to%20GitHub%20Pages/badge.svg)
+
 Node driver for Sensirion HDLC devices. This package is largely modeled after
 [Sensirion/python-shdlc-driver: Python Driver for Sensirion SHDLC Devices](https://github.com/Sensirion/python-shdlc-driver).
 
@@ -8,6 +11,7 @@ Node driver for Sensirion HDLC devices. This package is largely modeled after
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+- [Documentation](#documentation)
 - [Limitations](#limitations)
 - [Usage](#usage)
   - [Installation](#installation)
@@ -18,6 +22,13 @@ Node driver for Sensirion HDLC devices. This package is largely modeled after
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Documentation
+
+For basic module documentation please see
+[Sensirion HDLC Node Documentation](https://cytera.github.io/sensirion-hdlc-node/).
+This documentation is automatically generated code is committed to the main
+branch.
 
 ## Limitations
 
