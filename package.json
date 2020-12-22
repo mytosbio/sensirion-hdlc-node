@@ -35,11 +35,11 @@
         "*.{json,md}": [
             "prettier --prose-wrap always --write"
         ],
-        "README.md": [
-            "doctoc"
-        ],
         "package.json": [
             "sort-package-json"
+        ],
+        "{CONTRIBUTING,README}.md": [
+            "doctoc"
         ]
     },
     "prettier": "@cytera/prettier-config",

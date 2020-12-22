@@ -91,17 +91,20 @@ main();
 ## Development
 
 Please feel free to fork and modify this code. We have attempted to add some
-basic cde quality checks to the process. When creating commits the Typescript
+basic code quality checks to the process. When creating commits the Typescript
 files are built and linted to check they conform to the correct standards. If
 using VSCode then we highly recommend installing the prettier and eslint
 extensions.
+
+For more details on how to contribute to this project please see
+[Contributing][contributing.md] guidelines.
 
 ### Running tests
 
 There are extensive tests to assert correct functionality. The test runner used
 is `jest` which accepts a number of arguments to watch the test files and filter
 tests based on filename. The following command will run all the tests for the
-reposiotory.
+repository.
 
 ```
 yarn run test
