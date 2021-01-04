@@ -1,8 +1,8 @@
 {
     "name": "@cytera/sensirion-hdlc",
-    "version": "1.0.0-4",
-    "license": "UNLICENSED",
-    "author": "Cytera",
+    "version": "1.0.0-5",
+    "license": "MIT",
+    "author": "Cytera CellWorks",
     "main": "dist/index.js",
     "source": "src/index.ts",
     "types": "dist/index.d.js",
@@ -12,16 +12,16 @@
         "commit-hook": "npm-run-all lint:typescript lint-staged",
         "dev": "ts-node-dev src/index.ts",
         "doctoc": "doctoc README.md",
+        "eslint": "eslint",
         "lint": "npm-run-all lint:*",
         "lint-staged": "lint-staged",
-        "lint:eslint": "eslint '*.js' 'src/**/*.{js,ts}' 'tests/**/*.{js,ts}' --quiet --fix",
         "lint:typescript": "tsc --noEmit --allowJs",
         "prepublishOnly": "npm-run-all lint test build",
         "prettier": "prettier --prose-wrap always --write README.md",
         "sort-package-json": "sort-package-json",
         "test": "jest",
         "test-changed": "jest --onlyChanged",
-        "typedoc": "typedoc --out docs src"
+        "typedoc": "typedoc"
     },
     "husky": {
         "hooks": {
@@ -35,11 +35,11 @@
         "*.{json,md}": [
             "prettier --prose-wrap always --write"
         ],
-        "README.md": [
-            "doctoc"
-        ],
         "package.json": [
             "sort-package-json"
+        ],
+        "{CONTRIBUTING,README}.md": [
+            "doctoc"
         ]
     },
     "prettier": "@cytera/prettier-config",

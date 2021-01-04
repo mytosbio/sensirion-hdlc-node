@@ -1,0 +1,13 @@
+name: Build lint test
+on: [push]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install modules
+              run: yarn
+            - name: Lint repository
+              run: yarn run eslint .
+            - name: Run tests
+              run: yarn run test
