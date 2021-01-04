@@ -67,6 +67,8 @@
 				<a href="#sensirion-hdlc-node" id="sensirion-hdlc-node" style="color: inherit; text-decoration: none;">
 					<h1>Sensirion HDLC Node</h1>
 				</a>
+				<p><img src="https://github.com/cytera/sensirion-hdlc-node/workflows/Build%20lint%20test/badge.svg" alt="Build lint test">
+				<img src="https://github.com/cytera/sensirion-hdlc-node/workflows/Publish%20to%20GitHub%20Pages/badge.svg" alt="Publish to GitHub Pages"></p>
 				<p>Node driver for Sensirion HDLC devices. This package is largely modeled after
 				<a href="https://github.com/Sensirion/python-shdlc-driver">Sensirion/python-shdlc-driver: Python Driver for Sensirion SHDLC Devices</a>.</p>
 				<blockquote>
@@ -75,6 +77,7 @@
 				<!-- START doctoc generated TOC please keep comment here to allow auto update -->
 				<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 				<ul>
+					<li><a href="#documentation">Documentation</a></li>
 					<li><a href="#limitations">Limitations</a></li>
 					<li><a href="#usage">Usage</a><ul>
 							<li><a href="#installation">Installation</a></li>
@@ -89,6 +92,13 @@
 					<li><a href="#license">License</a></li>
 				</ul>
 				<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+					<h2>Documentation</h2>
+				</a>
+				<p>For basic module documentation please see
+					<a href="https://cytera.github.io/sensirion-hdlc-node/">Sensirion HDLC Node Documentation</a>.
+					This documentation is automatically generated code is committed to the main
+				branch.</p>
 				<a href="#limitations" id="limitations" style="color: inherit; text-decoration: none;">
 					<h2>Limitations</h2>
 				</a>
@@ -146,17 +156,19 @@ main();</code></pre>
 					<h2>Development</h2>
 				</a>
 				<p>Please feel free to fork and modify this code. We have attempted to add some
-					basic cde quality checks to the process. When creating commits the Typescript
+					basic code quality checks to the process. When creating commits the Typescript
 					files are built and linted to check they conform to the correct standards. If
 					using VSCode then we highly recommend installing the prettier and eslint
 				extensions.</p>
+				<p>For more details on how to contribute to this project please see
+				[Contributing][contributing.md] guidelines.</p>
 				<a href="#running-tests" id="running-tests" style="color: inherit; text-decoration: none;">
 					<h3>Running tests</h3>
 				</a>
 				<p>There are extensive tests to assert correct functionality. The test runner used
 					is <code>jest</code> which accepts a number of arguments to watch the test files and filter
 					tests based on filename. The following command will run all the tests for the
-				reposiotory.</p>
+				repository.</p>
 				<pre><code>yarn <span class="hljs-keyword">run</span><span class="bash"> <span class="hljs-built_in">test</span></span></code></pre>
 				<a href="#building-documentation" id="building-documentation" style="color: inherit; text-decoration: none;">
 					<h3>Building documentation</h3>
